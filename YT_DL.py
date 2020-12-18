@@ -47,7 +47,7 @@ def run(video_url='https://youtu.be/BLeOcCeqsfI', titile='other', artist='other'
             return 'success'
         except:
             print('Oops!! Something went wrong!!')
-            return 'failed'
+            return 'fail'
 
 def fetchFromSongList(songList):
     for song in songList:
