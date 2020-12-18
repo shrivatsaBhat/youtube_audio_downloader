@@ -1,57 +1,3 @@
-
-# import os
-# try:
-#     import youtube_dl
-# except:
-#     os.system('pip install youtube_dl')
-#     import youtube_dl
-        
-# import csv
-# import json
-# with open("C:\\Users\\shriv\Desktop\\tableconvert_csv_0ht0ew.csv", 'r') as file:
-#     # reader = csv.reader(file)
-#     # print(reader)
-#     # for row in reader:
-
-#     #     # row = row.split('(')
-#     #     print(row)
-#     csv_file = csv.DictReader(file)
-#     for row in csv_file:
-#         j = dict(row)
-#         print(j['Title'])
-        
-
-
-# def run(link):
-#     # Ask the user for the video they want to download
-#     # video_url = 'https://youtu.be/uKHlnmepnNA'
-#     video_url=link
-#     # Download and convert to mp3 and store in downloads folder
-#     video_info = youtube_dl.YoutubeDL().extract_info(
-#         url=video_url, download=False
-#     )
-#     filename = f"{video_info['title']}.mp3"
-#     options = {
-#         'format': 'bestaudio/best',
-#         'keepvideo': False,
-#         'outtmpl': filename,
-#         'postprocessors': [{
-#             'key': 'FFmpegExtractAudio',
-#             'preferredcodec': 'mp3',
-#             'preferredquality': '192',
-#         }]
-#     }
-#     with youtube_dl.YoutubeDL(options) as ydl:
-#         ydl.download([video_info['webpage_url']])
-
-
-# if __name__ == '__main__':
-# 	links=['https://youtu.be/uKHlnmepnNA','https://youtu.be/lG1y7x_W-kQ']
-# 	for i in range(len(links)):
-# 		print(links[i])
-# 	for i in range(len(links)):
-# 		run(links[i])
-
 import os
 import time
 try:
@@ -82,14 +28,6 @@ def getCsvData(csvFile):
 
 def run(video_url='https://youtu.be/BLeOcCeqsfI', titile='other', artist='other'):
 
-    # Download and convert to mp3 and store in downloads folder
-    # try:
-    #     video_info = youtube_dl.YoutubeDL().extract_info(
-    #     url=video_url, download=False)
-    # except:
-    #     return 'failed'
-
-    # filename = f"./DOWNLOADED/{artist}/{video_info['title']}.mp3"
     filename = f"./download/{artist}/{titile}.mp3"
     options = {
         'format': 'bestaudio/best',
@@ -105,7 +43,7 @@ def run(video_url='https://youtu.be/BLeOcCeqsfI', titile='other', artist='other'
         try:
             # ydl.download([video_info['webpage_url']])
             ydl.download([video_url])
-            time.sleep(3) # Sleep for 3 seconds
+            time.sleep(5) # Sleep for 5 seconds
             return 'success'
         except:
             print('Oops!! Something went wrong!!')
@@ -137,7 +75,7 @@ def main():
         try:
             fetchFromSongList(songList)
         except:
-            print('--failed to load '+songList)
+            print('--- failed to load ',str(songList))
 
 if __name__ == '__main__':
     main()
