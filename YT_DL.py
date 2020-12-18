@@ -63,8 +63,10 @@ def fetchFromSongList(songList):
             pass
         elif(status == 'fail'):
             print('!!--- Sorry song '+str(title)+' from artist: '+str(artistName)+' from link: '+str(videoUrl)+' failed ---!!')
+            pass
         else:
             print('Someting went wrong!!')
+            pass
 
 def main():
     # Feth each csv file 
