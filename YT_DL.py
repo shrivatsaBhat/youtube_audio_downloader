@@ -35,18 +35,23 @@ class DisplayLog(object):
         pass
 
     def error(self, msg):
-        print(f'{msg}')
+        # print(f'{msg}')
+        pass
 
 isFinished = False
 
 def OnComplete_hook(status):
+    if status['status'] == 'downloading':
+        print(f"{status['status']}>>> {status['_percent_str']} of file-size: {status['_total_bytes_str']}")
+
     if status['status'] == 'finished':
         isFinished = True
-        print(f"{status['status']} downloading -> {status['filename']}\nNow converting ...")
+        print(f"{status['status']} downloading -> {status['filename']} \nNow converting ...")
 
 def run(video_url='https://youtu.be/BLeOcCeqsfI', title='unknown', artist='other'):
     filename = f"./download/{artist}/{title}.mp3"
     ydl_opts = {
+        'ignoreerrors':True,
         'format': 'bestaudio/best',
         # 'outtmpl': filename,
         'postprocessors': [{
@@ -58,7 +63,10 @@ def run(video_url='https://youtu.be/BLeOcCeqsfI', title='unknown', artist='other
         'progress_hooks': [OnComplete_hook],
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([video_url])
+        try:
+            ydl.download([video_url])
+        except:
+            pass
 
 def fetchFromSongList(songList):
     for song in songList:
