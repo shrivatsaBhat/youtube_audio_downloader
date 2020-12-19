@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import os
 import time
 try:
@@ -26,28 +27,38 @@ def getCsvData(csvFile):
             csvFileContent.append(dict(row))
         return csvFileContent
 
-def run(video_url='https://youtu.be/BLeOcCeqsfI', titile='other', artist='other'):
+class DisplayLog(object):
+    def debug(self, msg):
+        pass
 
-    filename = f"./download/{artist}/{titile}.mp3"
-    options = {
+    def warning(self, msg):
+        pass
+
+    def error(self, msg):
+        print(f'{msg}')
+
+isFinished = False
+
+def OnComplete_hook(status):
+    if status['status'] == 'finished':
+        isFinished = True
+        print(f"{status['status']} downloading -> {status['filename']}\nNow converting ...")
+
+def run(video_url='https://youtu.be/BLeOcCeqsfI', title='unknown', artist='other'):
+    filename = f"./download/{artist}/{title}.mp3"
+    ydl_opts = {
         'format': 'bestaudio/best',
-        'keepvideo': False,
-        'outtmpl': filename,
+        # 'outtmpl': filename,
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'preferredquality': '192',
-        }]
+        }],
+        'logger': DisplayLog(),
+        'progress_hooks': [OnComplete_hook],
     }
-    with youtube_dl.YoutubeDL(options) as ydl:
-        try:
-            # ydl.download([video_info['webpage_url']])
-            ydl.download([video_url])
-            time.sleep(5) # Sleep for 5 seconds
-            return 'success'
-        except:
-            print('Oops!! Something went wrong!!')
-            return 'fail'
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([video_url])
 
 def fetchFromSongList(songList):
     for song in songList:
@@ -55,29 +66,31 @@ def fetchFromSongList(songList):
         songInfo= songInfo.split('](')
         title= songInfo[0]
         title = title[1:]
+
         videoUrl = songInfo[1]
         videoUrl = videoUrl[:-1]
+
         artistName = song['Artiste']
-        status = run(str(videoUrl), str(title), str(artistName))
-        if(status=='success'):
-            pass
-        elif(status == 'fail'):
-            print('!!--- Sorry song '+str(title)+' from artist: '+str(artistName)+' from link: '+str(videoUrl)+' failed ---!!')
-            pass
-        else:
-            print('Someting went wrong!!')
-            pass
+
+        return {'title':title, 'videoUrl':videoUrl, 'artist':artistName}
+
 
 def main():
+    global isFinished
     # Feth each csv file 
     songListCSVFiles = os.listdir('./songList')
 
     for csvFile in songListCSVFiles:
+        isFinished = False
         songList = getCsvData('./songList/'+csvFile)
         try:
-            fetchFromSongList(songList)
+            video_info = fetchFromSongList(songList)
+            os.chdir(f"./download/{video_info['artist']}")
+            run(video_info['videoUrl'], video_info['title'], video_info['artist'])
+            os.chdir(f"./download")
+            print('***')
         except:
-            print('--- failed to load ',str(songList))
+            print('failed to load ',str(songList))
 
 if __name__ == '__main__':
     main()
