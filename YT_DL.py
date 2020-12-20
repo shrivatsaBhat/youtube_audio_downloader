@@ -38,8 +38,6 @@ class DisplayLog(object):
         # print(f'{msg}')
         pass
 
-isFinished = False
-
 def OnComplete_hook(status):
     if status['status'] == 'downloading':
         print(f"{status['status']}>>> {status['_percent_str']} of file-size: {status['_total_bytes_str']}")
@@ -48,12 +46,10 @@ def OnComplete_hook(status):
         isFinished = True
         print(f"{status['status']} downloading -> {status['filename']} \nNow converting ...")
 
-def run(video_url='https://youtu.be/BLeOcCeqsfI', title='unknown', artist='other'):
-    filename = f"./download/{artist}/{title}.mp3"
+def run(video_url='https://youtu.be/BLeOcCeqsfI'):
     ydl_opts = {
         'ignoreerrors':True,
         'format': 'bestaudio/best',
-        # 'outtmpl': filename,
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -71,7 +67,10 @@ def run(video_url='https://youtu.be/BLeOcCeqsfI', title='unknown', artist='other
 def fetchFromSongList(songList):
     for song in songList:
         songInfo=song['Title']
-        songInfo= songInfo.split('](')
+        try:
+            songInfo= songInfo.split('](')
+        except:
+            pass
         title= songInfo[0]
         title = title[1:]
 
@@ -84,19 +83,40 @@ def fetchFromSongList(songList):
 
 
 def main():
-    global isFinished
     # Feth each csv file 
     songListCSVFiles = os.listdir('./songList')
+    fileLocation = os.getcwd()
+    downloadFileFolder = 'download'
+    customPath = os.path.join(fileLocation,downloadFileFolder)
 
     for csvFile in songListCSVFiles:
-        isFinished = False
+        os.chdir(fileLocation)
         songList = getCsvData('./songList/'+csvFile)
         try:
             video_info = fetchFromSongList(songList)
-            os.chdir(f"./download/{video_info['artist']}")
-            run(video_info['videoUrl'], video_info['title'], video_info['artist'])
-            os.chdir(f"./download")
-            print('***')
+
+            path = os.path.join(customPath, video_info['artist'].replace(" ", "_"),'etc')
+
+            try:
+                dn = os.path.dirname(path)
+                try:
+                    os.chdir(dn)
+                except:
+                    pass
+                if dn and not os.path.exists(dn):
+                    os.makedirs(dn)
+                    os.chdir(dn)
+            except (OSError, IOError) as err:
+                self.report_error('unable to create directory ' + error_to_compat_str(err))
+
+            run(video_info['videoUrl'])
+            try:
+                # print('changed directory')
+                os.chdir(customPath)
+            except:
+                pass
+            # print(os.getcwd()) # get current directory information
+
         except:
             print('failed to load ',str(songList))
 
