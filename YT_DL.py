@@ -76,6 +76,8 @@ def fetchFromSongList(songList):
 
         videoUrl = songInfo[1]
         videoUrl = videoUrl[:-1]
+        video_url = videoUrl.split('?list')
+        video_url = video_url[0]
 
         artistName = song['Artiste']
 
